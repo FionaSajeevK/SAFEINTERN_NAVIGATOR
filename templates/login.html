@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SafeIntern</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar glass-panel">
+        <a href="/" class="logo">
+            <img src="/logo.png" onerror="this.style.display='none'" alt="SafeIntern">
+        </a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+        </div>
+    </nav>
+
+    <div class="auth-container glass-panel">
+        <h2 style="text-align: center; margin-bottom: 5px;" id="auth-title">Student Login</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem;" id="auth-subtitle">Login to your account</p>
+        
+        <div class="auth-tabs">
+            <div class="auth-tab active" id="tab-student" onclick="switchUserType('student')">
+                <i class="fas fa-user-graduate"></i>
+                <span>Student</span>
+            </div>
+            <div class="auth-tab" id="tab-company" onclick="switchUserType('company')">
+                <i class="fas fa-building"></i>
+                <span>Company</span>
+            </div>
+        </div>
+
+        <!-- Student Form -->
+        <div id="form-student">
+            <form id="student-login-form" onsubmit="handleLogin(event, 'student')">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div style="position: relative;">
+                        <input type="password" class="form-control" name="password" placeholder="Enter password" required>
+                        <i class="fas fa-eye" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted);" onclick="togglePassword(this)"></i>
+                    </div>
+                </div>
+                <p id="student-login-error" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 10px; display: none;"></p>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                    Don't have an account? <a href="#" onclick="toggleMode('student')">Register</a>
+                </p>
+            </form>
+
+            <form id="student-register-form" class="hidden" onsubmit="handleRegister(event, 'student')">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" name="fullname" placeholder="Enter full name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email ID</label>
+                    <input type="email" class="form-control" name="email" placeholder="Enter email id" required>
+                </div>
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" class="form-control" name="contactNo" placeholder="+91 XXXXXXXXXX" required>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div style="position: relative;">
+                        <input type="password" class="form-control" id="s-pass" name="password" placeholder="Enter password" required>
+                        <i class="fas fa-eye" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted);" onclick="togglePassword(this)"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" class="form-control" id="s-cpass" name="confirm_password" placeholder="Confirm password" required>
+                </div>
+                <p id="student-reg-error" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 10px; display: none;"></p>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">Register</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                    Already have an account? <a href="#" onclick="toggleMode('student')">Login</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Company Form -->
+        <div id="form-company" class="hidden">
+            <form id="company-login-form" onsubmit="handleLogin(event, 'company')">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div style="position: relative;">
+                        <input type="password" class="form-control" name="password" placeholder="Enter password" required>
+                        <i class="fas fa-eye" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted);" onclick="togglePassword(this)"></i>
+                    </div>
+                </div>
+                <p id="company-login-error" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 10px; display: none;"></p>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                    Don't have an account? <a href="#" onclick="toggleMode('company')">Register</a>
+                </p>
+            </form>
+
+            <form id="company-register-form" class="hidden" onsubmit="handleRegister(event, 'company')">
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" class="form-control" name="companyName" placeholder="Enter company name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email ID</label>
+                    <input type="email" class="form-control" name="email" placeholder="Enter email id" required>
+                </div>
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" class="form-control" name="contactNo" placeholder="+91 XXXXXXXXXX" required>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div style="position: relative;">
+                        <input type="password" class="form-control" id="c-pass" name="password" placeholder="Enter password" required>
+                        <i class="fas fa-eye" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted);" onclick="togglePassword(this)"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" class="form-control" id="c-cpass" name="confirm_password" placeholder="Confirm password" required>
+                </div>
+                <p id="company-reg-error" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 10px; display: none;"></p>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">Register</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                    Already have an account? <a href="#" onclick="toggleMode('company')">Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        function togglePassword(icon) {
+            const input = icon.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Add dynamic heading update to existing functions
+        const originalToggleMode = window.toggleMode;
+        window.toggleMode = function(type) {
+            if(originalToggleMode) originalToggleMode(type);
+            updateAuthHeadings();
+        };
+
+        const originalSwitchUserType = window.switchUserType;
+        window.switchUserType = function(type) {
+            if(originalSwitchUserType) originalSwitchUserType(type);
+            updateAuthHeadings();
+        };
+
+        function updateAuthHeadings() {
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            
+            // Check student tab active status
+            const isStudent = document.getElementById('tab-student').classList.contains('active');
+            const type = isStudent ? 'student' : 'company';
+            
+            const formLogin = document.getElementById(type + '-login-form');
+            if(!formLogin) return;
+            
+            const isLogin = !formLogin.classList.contains('hidden');
+            const userDisplay = isStudent ? 'Student' : 'Company';
+            
+            if (isLogin) {
+                title.textContent = userDisplay + ' Login';
+                subtitle.textContent = 'Login to your account';
+            } else {
+                title.textContent = userDisplay + ' Registration';
+                subtitle.textContent = 'Create a new account';
+            }
+        }
+
+        // Initial setup
+        window.onload = function() {
+            setTimeout(updateAuthHeadings, 100);
+        };
+    </script>
+</body>
+</html>

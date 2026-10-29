@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard - SafeIntern</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <style>
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Cropper modal styling */
+        .crop-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1000; padding:20px; width:400px; max-width:90vw; }
+        .crop-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; }
+    </style>
+</head>
+<body class="dashboard">
+
+    <div id="crop-overlay" class="crop-overlay"></div>
+    <div id="crop-modal" class="crop-modal glass-panel">
+        <h3 style="margin-bottom:15px">Crop your Image</h3>
+        <div style="height: 300px; overflow:hidden; background:#eee;">
+            <img id="crop-image" src="" style="max-width:100%;">
+        </div>
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button id="crop-btn" class="btn btn-primary">Save Picture</button>
+            <button onclick="closeCropper()" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+
+    <aside class="sidebar glass-panel">
+        <a href="/" class="logo" style="justify-content: center; margin-bottom: 30px;">
+            <img style="max-height: 70px;" src="/logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3281/3281289.png'" alt="SafeIntern">
+        </a>
+        <a class="sidebar-link active" onclick="showSection('profile', this)">
+            <i class="fas fa-building"></i> Company Profile
+        </a>
+        <a class="sidebar-link" onclick="showSection('add-internship', this)">
+            <i class="fas fa-plus-circle"></i> Add Internship
+        </a>
+        <a href="/logout" class="sidebar-link" style="margin-top: auto;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </aside>
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h2 id="section-header-title">Company Profile</h2>
+            <div class="header-user-profile">
+                <span id="header-user-name">Company</span>
+                <img id="header-user-img" src="/static/uploads/default_profile.png" alt="Profile">
+            </div>
+        </header>
+        
+        <!-- PROFILE SECTION -->
+        <div id="profile" class="section active">
+            <div class="profile-main-card">
+                <div class="profile-top-info">
+                    <div class="profile-picture-container" style="cursor: pointer;" onclick="document.getElementById('c-pfp-upload').click()">
+                        <img id="company-img-display" src="/static/uploads/default_profile.png" class="company-large-logo" alt="Profile">
+                        <div class="picture-edit-overlay"><i class="fas fa-camera"></i></div>
+                    </div>
+                    <input type="file" id="c-pfp-upload" style="display: none;" accept="image/*" onchange="handleImageSelect(event, 'company')">
+                    
+                    <div style="flex: 1;">
+                        <h2 id="company-name-display" style="margin: 0 0 5px 0; font-size: 1.8rem;">Company Name</h2>
+                        <p id="company-email-display" style="margin: 0 0 15px 0; color: #666;">brand@example.com</p>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button class="btn btn-outline-primary" style="padding: 8px 18px; font-size: 0.85rem;" onclick="toggleEditMode()">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                            <button class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem;" onclick="showVerification()">
+                                Get Verified
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="c-form" class="dashboard-form view-mode" onsubmit="updateCompanyProfile(event)">
+                    <div class="profile-grid">
+                        <div class="info-item">
+                            <label>Company Name</label>
+                            <input type="text" class="form-control" name="company_name" id="c-name" required readonly>
+                        </div>
+                        <div class="info-item">
+                            <label>Company Location</label>
+                            <input type="text" class="form-control" name="location" id="c-location" placeholder="e.g. New York, USA" readonly>
+                        </div>
+                        <div class="info-item">
+                            <label>Company Email</label>
+                            <input type="email" class="form-control" name="email_id" id="c-email" required readonly>
+                        </div>
+                        <div class="info-item">
+                            <label>Contact No</label>
+                            <input type="text" class="form-control" name="contact_no" id="c-contact" placeholder="e.g. +1 234 567 890" readonly>
+                        </div>
+                        <div class="info-item">
+                            <label>LinkedIn</label>
+                            <input type="text" class="form-control" name="linkedin_url" id="c-linkedin" placeholder="linkedin.com/company/..." readonly>
+                        </div>
+                        <div class="info-item">
+                            <label>Website URL</label>
+                            <input type="text" class="form-control" name="website_url" id="c-website" placeholder="https://www.yourcompany.com" readonly>
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px; display: none;" id="c-save-actions">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" style="margin-left: 10px;" onclick="toggleEditMode(true)">Cancel</button>
+                        <span id="c-msg" style="margin-left: 15px; color: var(--secondary);"></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Gallery Section -->
+            <div class="gallery-section" style="margin-top: 40px;">
+                <div class="gallery-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #333; font-size: 1.2rem;">Company & Internship Gallery</h3>
+                    <button class="btn btn-primary" style="padding: 6px 15px; font-size: 0.85rem;" onclick="document.getElementById('gallery-upload').click()">
+                        <i class="fas fa-plus"></i> Add Photos
+                    </button>
+                    <input type="file" id="gallery-upload" style="display: none;" accept="image/*" onchange="uploadGalleryImage(event)">
+                </div>
+                <div class="gallery-grid" id="gallery-container">
+                    <!-- Gallery items will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD INTERNSHIP SECTION -->
+        <div id="add-internship" class="section">
+            <div class="post-trigger-box" onclick="openPostModal()">
+                <i class="fas fa-plus-circle" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 5px;"></i>
+                <h3 style="margin: 0; color: var(--secondary); font-size: 1.1rem; font-weight: 600;">Post a New Internship</h3>
+            </div>
+
+            <div class="active-postings-header">Your Active Postings</div>
+            <div id="my-internships-container">
+                <!-- Rectangular cards populated by JS -->
+                <p style="color: #64748b; font-size: 0.9rem; text-align: center; margin-top: 20px;">No active postings yet.</p>
+            </div>
+        </div>
+
+        </div>
+    <!-- COMPANY VERIFICATION MODAL -->
+    <div id="v-modal-overlay" class="post-modal-overlay" onclick="closeVerificationModal()"></div>
+    <div id="v-modal" class="post-modal" style="width: 1100px; max-width: 95vw; padding: 60px;">
+        <div class="verification-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h3 style="margin: 0; font-size: 1.5rem; color: var(--text-main);">Company Verification</h3>
+            <button class="btn" onclick="closeVerificationModal()" style="padding: 5px 10px; font-size: 1.5rem; border: none; background: transparent; cursor: pointer;">&times;</button>
+        </div>
+        
+        <p class="verification-desc" style="font-size: 1.1rem; margin-bottom: 40px; color: #64748b;">
+            Please provide the following details and documents to verify your company's authenticity. 
+            This will grant you a verification badge and increase trust with applicants.
+        </p>
+        
+        <form id="verification-form" onsubmit="submitVerification(event)">
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label style="font-size: 1rem; font-weight: 600; display: block; margin-bottom: 10px;">Registered Company Name</label>
+                <input type="text" id="v-reg-name" class="form-control" style="padding: 15px; font-size: 1rem; width: 100%;" placeholder="Enter legal company name" required>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+                <div class="form-group">
+                    <label style="font-size: 1rem; font-weight: 600; display: block; margin-bottom: 10px;">Registration / License Number</label>
+                    <input type="text" id="v-license" class="form-control" style="padding: 15px; font-size: 1rem; width: 100%;" placeholder="e.g. GSTIN, CIN, etc." required>
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 1rem; font-weight: 600; display: block; margin-bottom: 10px;">Country of Operation</label>
+                    <input type="text" id="v-country" class="form-control" style="padding: 15px; font-size: 1rem; width: 100%;" placeholder="e.g. India" required>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 35px;">
+                <label style="font-size: 1rem; font-weight: 600; display: block; margin-bottom: 10px;">Upload certificate of License / Incorporation</label>
+                <div class="upload-zone" onclick="document.getElementById('v-cert-file').click()" style="border: 2px dashed #007bff; border-radius: 12px; padding: 60px; text-align: center; cursor: pointer; transition: all 0.3s; background: #f8fbff;">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 3.5rem; color: #007bff; margin-bottom: 20px;"></i>
+                    <p id="v-upload-text" style="font-size: 1.1rem; color: #64748b; margin: 0;">Click or drag to upload (PDF, JPG, PNG)</p>
+                    <input type="file" id="v-cert-file" style="display: none;" accept=".pdf,.jpg,.png" onchange="updateUploadLabel(this)">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1.1rem; font-weight: 600; border-radius: 12px; margin-top: 10px; background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border: none; color: white;">
+                Submit for verification
+            </button>
+        </form>
+    </div>
+
+        <!-- POSTING MODAL -->
+        <div id="post-modal-overlay" class="post-modal-overlay" onclick="closePostModal()"></div>
+        <div id="post-modal" class="post-modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                <h3 id="post-modal-title" style="margin: 0; color: var(--text-main); font-size: 1.25rem;">Post a New Internship</h3>
+                <button class="btn" onclick="closePostModal()" style="padding: 5px 10px; font-size: 1.2rem; border: none; background: transparent; cursor: pointer;">&times;</button>
+            </div>
+            
+            <form id="add-internship-form" onsubmit="submitInternship(event)">
+                <input type="hidden" id="post-id">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Internship Title</label>
+                        <input type="text" id="post-title" class="form-control" placeholder="e.g. Frontend Developer" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="post-location" class="form-control" placeholder="e.g. Bangalore, India" required>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Required Skills (Comma separated)</label>
+                        <input type="text" id="post-skills" class="form-control" placeholder="e.g. React, Node.js, CSS" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (e.g. 3 Months)</label>
+                        <input type="text" id="post-duration" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Work Mode</label>
+                        <select id="post-mode" class="form-control" required>
+                            <option value="WFH">Work From Home</option>
+                            <option value="Office">In-Office</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Stipend (₹)</label>
+                        <input type="number" id="post-stipend" class="form-control" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Fees (₹ - If any)</label>
+                        <input type="number" id="post-fees" class="form-control" value="0">
+                    </div>
+                    
+                    <!-- New Date Fields -->
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="post-start-date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="post-end-date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Date of Application</label>
+                        <input type="date" id="post-last-date" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Brief Description</label>
+                    <textarea id="post-description" class="form-control" rows="4" placeholder="Tell students about the role, responsibilities, and benefits..." required></textarea>
+                </div>
+                
+                <div style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closePostModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Publish Internship</button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- APPLICATIONS MODAL -->
+    <div id="apps-modal-overlay" class="post-modal-overlay" onclick="closeAppsModal()"></div>
+    <div id="apps-modal" class="post-modal" style="width: 900px; max-width: 95vw; padding: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+            <h3 id="apps-modal-title" style="margin: 0; color: var(--text-main); font-size: 1.25rem;">Applicants for Internship</h3>
+            <button class="btn" onclick="closeAppsModal()" style="padding: 5px 10px; font-size: 1.2rem; border: none; background: transparent; cursor: pointer;">&times;</button>
+        </div>
+        
+        <div id="apps-list-container" style="max-height: 60vh; overflow-y: auto;">
+            <!-- Applicant rows populated by JS -->
+            <p style="text-align: center; color: #64748b; padding: 20px;">Loading applicants...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

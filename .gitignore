@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+.env
+.venv/
+
+# Database (local data - do not share)
+safeintern.db
+*.db
+*.sqlite3
+
+# User uploaded files (local - do not share)
+static/uploads/
+
+# Flask / Werkzeug
+instance/
+.webassets-cache
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/

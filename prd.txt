@@ -1,0 +1,74 @@
+Product Requirement doc
+
+system want to create using python ,desingning choice is python or HTML,CSS and JavaScript.
+dbms: MySql
+product name
+   SafeIntern
+-optimize it for both desktop and mobile of every aspect ratio
+
+//HOME PAGE
+The home page  must contain the following sections
+
+-navbar on the top:logo,home,contact us,login
+-brief description [        ](left)
+-get started button(left)
+-Animation on the right 
+-contact us : email:- safeintern@gmail.com
+	      mobile no:-9478456309
+             
+//LOGIN PAGE
+-pop up must contain a question as [    ],two options as student/company with icons.it also contain student button under the student icon and company button under the company icon
+if user selected student then:
+ -//login page-student
+  it must take inputs and verify with student database.
+  
+   inputs: username, password ,if don't have account?Register, login button (if invalid generate an invalid message also reload student  login page )
+ -//Register page-student
+  it must take inputs and store it in student database.
+   inputs :full name,email_id,username,password,confirm password,register button(after clicking it again show the login page-student)
+
+if user selected company then:
+ -//login page-company
+   it must take inputs and verify with company database.
+  inputs: username, password ,if don't have account?Register, login button (if invalid generate an invalid message also reload student  login page )
+ -//Register page-company
+  it must take inputs and store it in company database.
+   inputs :company name,email_id,username,password,confirm password,register button(after clicking it again show the login page-company)
+
+
+AFTER LOGIN
+-for student
+//STUDENT PAGE
+-side navbar must contain :logo,explorer,profile,get recommendations
+  //explorer section
+in explorer section there must be a search bar , filter option (paid/free, with stipend/without stipend, work from home/ offline), get recommendation button(which will take us to profile section  )
+it must contain cards for each internship
+#internship-card
+it must contain :company name ,internship title ,view details(link), apply now button 
+ //profile section
+image of the student,Full name,email_id ,age,gender,education,address,skills,linked in link and git hub link,it must contain edit option
+
+once clicked on get recommendation button -it must load profile section and ask some other inputs which are: workmode with drop down (offline/online), preffered location-text field, stipend- input field, paid/ free option , get recommendation (we check skill match using cosine similarity and tfidf with internship database, it will open a section with internship card(in the above mention #internship-card  with most match to least match order, with match percent in the right) 
+
+
+-for company 
+//company Page 
+ -side nav Bar must contain: logo , profile, add internship 
+ in //profile section  
+ input: company name, company location , company email , conatct no .
+edit option 
+
+//add internship section 
+#card 
+with + icon 
+that opens pop up page  which contains following input fields: internship title, required skills, location ,internship duration,  work mode , stipend (if any ), fee (if any), brief description about internship-text field 
+
+
+
+
+
+     
+   
+   
+
+  

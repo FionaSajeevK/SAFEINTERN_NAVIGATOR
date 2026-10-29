@@ -113,24 +113,12 @@ SAFEINTERN_NAVIGATOR/
 - **Deployment:** Gunicorn
 
 ---
-
-## 📬 Contact
-
-- **Email:** safeintern@gmail.com
-- **Phone:** +91 9478456309
-
----
-
 ## 👥 Team
 
 | Name | Role |
 |---|---|
-| *(Your Name)* | Developer |
-| *(Teammate 1)* | Developer |
-| *(Teammate 2)* | Developer |
+| *(Fiona Sajeev K)* | Developer |
+| *(Akshara M P)* | Developer |
+| *(Aman V)* | Developer |
 
 ---
-
-## 📄 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

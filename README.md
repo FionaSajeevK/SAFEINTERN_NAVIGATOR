@@ -115,8 +115,8 @@ SAFEINTERN_NAVIGATOR/
 
 | Name | Role |
 |---|---|
-| *(Fiona Sajeev K)* | Developer |
-| *(Akshara M P)* | Developer |
-| *(Aman V)* | Developer |
+| *Fiona Sajeev K* | Developer |
+| *Akshara M P* | Developer |
+| *Aman V* | Developer |
 
 ---
